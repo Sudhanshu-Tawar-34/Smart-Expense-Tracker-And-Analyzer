@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=14">
+</head>
+
+<body class="auth-page d-flex align-items-center justify-content-center" style="height:100vh;">
+
+<!-- FLOATING BG -->
+<div class="auth-bg"></div>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:999;">
+    {% for msg in messages %}
+    <div class="alert alert-success text-center px-4 py-2 fade-in shadow">
+        {{msg}}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+
+            <div class="card auth-card p-5 shadow-lg border-0">
+
+                <h3 class="text-center mb-1 title-glow">Create Account 📝</h3>
+                <p class="text-center text-light small mb-4">Start tracking your finances</p>
+
+                {% if error %}
+                <div class="alert alert-danger text-center py-2 fade-in">
+                    {{error}}
+                </div>
+                {% endif %}
+
+                <!-- PREVIEW -->
+                <p id="preview" class="text-center glow small fw-bold mb-2"></p>
+
+                <form method="POST" onsubmit="return validateForm()">
+
+                    <!-- USERNAME -->
+                    <label class="form-label">Username</label>
+                    <input id="username"
+                           name="username"
+                           class="form-control mb-3"
+                           placeholder="Enter username"
+                           required autofocus>
+
+                    <!-- PASSWORD -->
+                    <label class="form-label">Password</label>
+                    <input id="password"
+                           name="password"
+                           type="password"
+                           class="form-control mb-2"
+                           placeholder="Enter password"
+                           required>
+
+                    <small id="strengthText" class="d-block mb-2"></small>
+
+                    <!-- CONFIRM -->
+                    <label class="form-label">Confirm Password</label>
+                    <input id="confirmPassword"
+                           name="confirm_password"
+                           type="password"
+                           class="form-control mb-2"
+                           placeholder="Re-enter password"
+                           required>
+
+                    <div id="matchError" class="text-danger small mb-2" style="display:none;">
+                        Passwords do not match ❌
+                    </div>
+
+                    <!-- OPTIONS -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" onclick="togglePassword()">
+                            <label class="form-check-label small">Show Passwords</label>
+                        </div>
+
+                        <small id="capsWarning" class="text-warning" style="display:none;">
+                            Caps Lock ON
+                        </small>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button id="btn" class="btn btn-success w-100 mb-3">
+                        Create Account
+                    </button>
+
+                </form>
+
+                <hr>
+
+                <!-- LOGIN LINK -->
+                <p class="text-center small mb-0">
+                    Already have an account?
+                    <a href="/" class="fw-bold signup-link">Login</a>
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+// toggle
+function togglePassword() {
+    let p = document.getElementById("password");
+    let c = document.getElementById("confirmPassword");
+
+    p.type = p.type === "password" ? "text" : "password";
+    c.type = c.type === "password" ? "text" : "password";
+}
+
+// preview
+document.getElementById("username").addEventListener("input", function() {
+    let val = this.value;
+    document.getElementById("preview").innerText =
+        val ? "Creating account for " + val : "";
+});
+
+// strength
+document.getElementById("password").addEventListener("input", function() {
+    let val = this.value;
+    let s = document.getElementById("strengthText");
+
+    if (!val) return s.innerText = "";
+
+    if (val.length < 4) {
+        s.innerText = "Weak password";
+        s.style.color = "#ff4b5c";
+    }
+    else if (val.length < 8) {
+        s.innerText = "Moderate password";
+        s.style.color = "#ffc107";
+    }
+    else {
+        s.innerText = "Strong password";
+        s.style.color = "#00ff88";
+    }
+});
+
+// caps lock
+document.getElementById("password").addEventListener("keyup", e => {
+    document.getElementById("capsWarning").style.display =
+        e.getModifierState("CapsLock") ? "block" : "none";
+});
+
+// match
+document.getElementById("confirmPassword").addEventListener("input", function() {
+    let pass = document.getElementById("password").value;
+    let confirm = this.value;
+
+    document.getElementById("matchError").style.display =
+        (confirm && pass !== confirm) ? "block" : "none";
+});
+
+// submit
+function validateForm() {
+    let btn = document.getElementById("btn");
+
+    btn.innerText = "Creating...";
+    btn.classList.remove("btn-success");
+    btn.classList.add("btn-secondary");
+    btn.disabled = true;
+
+    return true;
+}
+
+</script>
+
+<style>
+
+/* animated blobs */
+.auth-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.auth-bg::before,
+.auth-bg::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(0,255,200,0.15);
+    filter: blur(120px);
+    border-radius: 50%;
+    animation: float 10s infinite alternate ease-in-out;
+}
+
+.auth-bg::after {
+    top: 60%;
+    left: 60%;
+    background: rgba(0,123,255,0.15);
+    animation-delay: 3s;
+}
+
+@keyframes float {
+    from { transform: translate(0,0); }
+    to { transform: translate(80px,-60px); }
+}
+
+/* link */
+.signup-link {
+    color: #00ffc3;
+    text-decoration: none;
+}
+.signup-link:hover {
+    color: #66ffe0;
+    text-decoration: underline;
+}
+
+</style>
+
+</body>
+</html>

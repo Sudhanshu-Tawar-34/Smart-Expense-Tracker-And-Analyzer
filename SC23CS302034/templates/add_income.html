@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Income</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=7">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-black px-3 shadow-sm">
+    <span class="navbar-brand fw-bold">💰 Expense Tracker</span>
+
+    <div class="d-flex gap-2">
+        <a href="/dashboard" class="btn btn-outline-light btn-sm">Dashboard</a>
+        <a href="/add" class="btn btn-outline-success btn-sm">Smart Entry</a>
+        <a href="/history" class="btn btn-outline-info btn-sm">History</a>
+        <a href="/analysis" class="btn btn-outline-warning btn-sm">Analysis</a>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+</nav>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:999;">
+    {% for msg in messages %}
+    <div class="alert alert-success text-center px-4 py-2 fade-in shadow">
+        {{msg}}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container mt-5 col-md-5">
+
+    <div class="card auth-card p-4">
+
+        <h3 class="text-center mb-1 title-glow">Add Income 💰</h3>
+        <p class="text-center text-light small mb-3">Track your earnings smartly</p>
+
+        <!-- PREVIEW -->
+        <p id="preview" class="text-center glow fw-bold mb-2"></p>
+
+        <!-- HINT -->
+        <div id="hintBox" class="alert alert-info text-center py-2"
+             style="display:none;"></div>
+
+        <form method="POST" onsubmit="return validateForm()">
+
+            <!-- AMOUNT -->
+            <label class="form-label">Amount</label>
+            <input id="amount" name="amount" type="number" step="0.01"
+                   class="form-control mb-2" required autofocus>
+
+            <div id="error" class="text-danger small mb-2" style="display:none;">
+                Enter a valid amount ❌
+            </div>
+
+            <!-- QUICK BUTTONS -->
+            <div class="d-flex justify-content-between mb-2">
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setValue(1000)">₹1000</button>
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setValue(5000)">₹5000</button>
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setValue(10000)">₹10000</button>
+            </div>
+
+            <!-- ADJUST -->
+            <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-success btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(100)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">+100</button>
+
+                <button type="button" class="btn btn-success btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(500)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">+500</button>
+
+                <button type="button" class="btn btn-danger btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(-100)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">-100</button>
+            </div>
+
+            <!-- SLIDER -->
+            <input type="range" id="slider"
+                   min="0" max="50000" step="100"
+                   class="form-range mb-3">
+
+            <!-- SOURCE -->
+            <label class="form-label">Source</label>
+            <select name="source" id="source"
+                    class="form-control mb-3"
+                    onchange="updatePreview()" required>
+                <option value="" disabled selected>Select source</option>
+                <option>Salary</option>
+                <option>Pocket Money</option>
+                <option>Freelance</option>
+                <option>Gift</option>
+                <option>Other</option>
+            </select>
+
+            <!-- DATE -->
+            <label class="form-label">Date</label>
+            <input id="date" name="date" type="date"
+                   class="form-control mb-3" required>
+
+            <!-- BUTTONS -->
+            <div class="d-flex gap-2">
+                <button id="btn" class="btn btn-primary w-100">Add Income</button>
+                <button type="reset" class="btn btn-outline-light w-100">Reset</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+// AUTO DATE
+document.getElementById("date").valueAsDate = new Date();
+
+let amountInput = document.getElementById("amount");
+let slider = document.getElementById("slider");
+
+// SYNC
+amountInput.addEventListener("input", () => {
+    slider.value = amountInput.value;
+    updatePreview();
+});
+
+slider.addEventListener("input", () => {
+    amountInput.value = slider.value;
+    updatePreview();
+});
+
+// QUICK
+function setValue(val) {
+    amountInput.value = val;
+    slider.value = val;
+    updatePreview();
+}
+
+// ADJUST
+let interval = null;
+
+function adjustValue(val) {
+    let current = parseFloat(amountInput.value) || 0;
+    let newVal = Math.max(0, current + val);
+
+    amountInput.value = newVal;
+    slider.value = newVal;
+
+    // glow feedback
+    amountInput.style.boxShadow = "0 0 10px #00ffc3";
+    setTimeout(() => amountInput.style.boxShadow = "", 150);
+
+    updatePreview();
+}
+
+function startAdjust(val) {
+    adjustValue(val);
+    interval = setInterval(() => adjustValue(val), 120);
+}
+
+function stopAdjust() {
+    clearInterval(interval);
+}
+
+// PREVIEW + HINT
+function updatePreview() {
+    let val = amountInput.value;
+    let source = document.getElementById("source").value;
+    let preview = document.getElementById("preview");
+    let hint = document.getElementById("hintBox");
+
+    if (!val) {
+        preview.innerText = "";
+        hint.style.display = "none";
+        return;
+    }
+
+    preview.innerText = "Receiving ₹" + val + (source ? " from " + source : "");
+
+    if (val < 1000) {
+        hint.style.display = "block";
+        hint.innerText = "💡 Small income — try saving.";
+    }
+    else if (val > 10000) {
+        hint.style.display = "block";
+        hint.innerText = "🔥 Strong income — invest wisely!";
+    }
+    else {
+        hint.style.display = "block";
+        hint.innerText = "👍 Balanced income.";
+    }
+}
+
+// VALIDATION
+function validateForm() {
+    let amount = amountInput.value;
+    let error = document.getElementById("error");
+    let btn = document.getElementById("btn");
+
+    if (!amount || amount <= 0) {
+        error.style.display = "block";
+        return false;
+    }
+
+    error.style.display = "none";
+
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    return true;
+}
+
+</script>
+
+</body>
+</html>

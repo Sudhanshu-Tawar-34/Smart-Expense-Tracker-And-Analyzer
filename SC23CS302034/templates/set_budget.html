@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Set Budget</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=13">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-black px-3 shadow-sm">
+    <span class="navbar-brand fw-bold">💰 Expense Tracker</span>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="/dashboard" class="btn btn-outline-light btn-sm">Dashboard</a>
+        <a href="/history" class="btn btn-outline-info btn-sm">History</a>
+        <a href="/analysis" class="btn btn-outline-warning btn-sm">Analysis</a>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+</nav>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:999;">
+    {% for msg in messages %}
+    <div class="alert alert-success text-center px-4 py-2 fade-in shadow">
+        {{msg}}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container mt-5 col-md-5">
+
+    <div class="card auth-card p-4">
+
+        <h3 class="text-center mb-1 title-glow">Set Monthly Budget 💰</h3>
+        <p class="text-center text-light small mb-3">Control your spending smartly</p>
+
+        <!-- CURRENT -->
+        {% if budget %}
+        <div class="alert alert-dark text-center py-2">
+            Current Budget: ₹{{budget}}
+        </div>
+        {% endif %}
+
+        <!-- PREVIEW -->
+        <p id="preview" class="text-center glow fw-bold mb-2"></p>
+
+        <!-- HINT -->
+        <div id="hintBox" class="alert alert-info text-center py-2"
+             style="display:none;"></div>
+
+        <!-- WARNING -->
+        <div id="warningBox" class="alert alert-danger text-center py-2"
+             style="display:none;"></div>
+
+        <form method="POST" onsubmit="return validateForm()">
+
+            <!-- INPUT -->
+            <label class="form-label">Monthly Budget</label>
+            <input id="budgetInput"
+                   name="budget"
+                   type="number"
+                   step="0.01"
+                   class="form-control mb-2"
+                   required autofocus>
+
+            <div id="error" class="text-danger small mb-2" style="display:none;">
+                Enter a valid budget ❌
+            </div>
+
+            <!-- QUICK SET -->
+            <div class="d-flex justify-content-between mb-2">
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setBudget(5000)">₹5000</button>
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setBudget(10000)">₹10000</button>
+                <button type="button" class="btn btn-outline-light btn-sm flex-fill mx-1" onclick="setBudget(20000)">₹20000</button>
+            </div>
+
+            <!-- ADJUST -->
+            <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-success btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(500)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">+500</button>
+
+                <button type="button" class="btn btn-success btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(1000)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">+1000</button>
+
+                <button type="button" class="btn btn-danger btn-sm flex-fill mx-1"
+                        onmousedown="startAdjust(-500)" onmouseup="stopAdjust()" onmouseleave="stopAdjust()">-500</button>
+            </div>
+
+            <!-- SLIDER -->
+            <input type="range" id="slider"
+                   min="0" max="50000" step="500"
+                   class="form-range mb-3">
+
+            <!-- SUBMIT -->
+            <button id="btn" class="btn btn-primary w-100">
+                Save Budget
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+let input = document.getElementById("budgetInput");
+let slider = document.getElementById("slider");
+
+// SYNC
+input.addEventListener("input", () => {
+    slider.value = input.value;
+    updatePreview();
+});
+
+slider.addEventListener("input", () => {
+    input.value = slider.value;
+    updatePreview();
+});
+
+// QUICK SET
+function setBudget(val) {
+    input.value = val;
+    slider.value = val;
+    updatePreview();
+}
+
+// ADJUST
+let interval = null;
+
+function adjustValue(val) {
+    let current = parseFloat(input.value) || 0;
+    let newVal = Math.max(0, current + val);
+
+    input.value = newVal;
+    slider.value = newVal;
+
+    // glow feedback (consistent with other pages)
+    input.style.boxShadow = "0 0 10px #00ffc3";
+    setTimeout(() => input.style.boxShadow = "", 150);
+
+    updatePreview();
+}
+
+function startAdjust(val) {
+    adjustValue(val);
+    interval = setInterval(() => adjustValue(val), 120);
+}
+
+function stopAdjust() {
+    clearInterval(interval);
+}
+
+// PREVIEW + LOGIC
+function updatePreview() {
+    let val = parseFloat(input.value);
+    let preview = document.getElementById("preview");
+    let hint = document.getElementById("hintBox");
+    let warn = document.getElementById("warningBox");
+
+    if (!val) {
+        preview.innerText = "";
+        hint.style.display = "none";
+        warn.style.display = "none";
+        return;
+    }
+
+    preview.innerText = "Monthly limit: ₹" + val;
+
+    if (val < 3000) {
+        hint.style.display = "block";
+        hint.innerText = "⚠️ Tight budget";
+    }
+    else if (val > 20000) {
+        hint.style.display = "block";
+        hint.innerText = "💡 High budget — ensure savings";
+    }
+    else {
+        hint.style.display = "block";
+        hint.innerText = "👍 Balanced budget";
+    }
+
+    if (val < 2000) {
+        warn.style.display = "block";
+        warn.innerText = "⚠️ Risk of overspending!";
+    } else {
+        warn.style.display = "none";
+    }
+}
+
+// VALIDATION
+function validateForm() {
+    let val = input.value;
+    let error = document.getElementById("error");
+    let btn = document.getElementById("btn");
+
+    if (!val || val <= 0) {
+        error.style.display = "block";
+        return false;
+    }
+
+    error.style.display = "none";
+
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    return true;
+}
+
+</script>
+
+</body>
+</html>

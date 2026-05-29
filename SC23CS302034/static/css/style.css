@@ -1,0 +1,232 @@
+/* ===============================
+   🌌 GLOBAL BACKGROUND (ANIMATED)
+================================ */
+body {
+    background: linear-gradient(135deg, #020c1b, #0a192f);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+}
+
+/* subtle animated gradient */
+body::before {
+    content: "";
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 20% 20%, rgba(0,255,200,0.08), transparent),
+                radial-gradient(circle at 80% 70%, rgba(0,123,255,0.08), transparent);
+    animation: moveBg 20s linear infinite;
+    z-index: -2;
+}
+
+@keyframes moveBg {
+    from { transform: translate(0,0); }
+    to { transform: translate(-200px,-150px); }
+}
+
+/* Auth override */
+body.auth-page {
+    background: linear-gradient(135deg, #020c1b, #112240);
+}
+
+/* ===============================
+   🧊 GLASS CARDS (DEPTH UPGRADE)
+================================ */
+.card, .auth-card {
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: all 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+.card:hover, .auth-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+}
+
+/* ===============================
+   ✨ INPUTS (POLISHED)
+================================ */
+.form-control {
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: white;
+    transition: all 0.25s ease;
+}
+
+.form-control::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.form-control:focus {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid #00ffc3;
+    box-shadow: 0 0 12px rgba(0,255,200,0.6);
+    transform: scale(1.01);
+}
+
+/* ===============================
+   🔘 BUTTON SYSTEM (REAL UPGRADE)
+================================ */
+.btn {
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+/* glow ripple */
+.btn::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.4s;
+}
+
+.btn:active::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* Primary */
+.btn-primary {
+    background: linear-gradient(135deg, #00ffc3, #007bff);
+    border: none;
+    box-shadow: 0 0 10px rgba(0,255,200,0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 18px rgba(0,255,200,0.7);
+}
+
+/* Success */
+.btn-success {
+    background: linear-gradient(135deg, #00ff88, #00c853);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: scale(1.03);
+}
+
+/* Danger */
+.btn-danger {
+    background: linear-gradient(135deg, #ff4b5c, #c62828);
+    border: none;
+}
+
+.btn-danger:hover {
+    transform: scale(1.03);
+}
+
+/* ===============================
+   🎯 TEXT SYSTEM
+================================ */
+.title-glow {
+    color: #00ffc3;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0,255,200,0.6);
+}
+
+.glow {
+    color: #00ffc3;
+}
+
+/* ===============================
+   🔗 LINKS (FIXED)
+================================ */
+a {
+    color: #00ffc3;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+a:hover {
+    color: #66ffe0;
+    text-decoration: underline;
+}
+
+/* ===============================
+   📊 STAT CARDS
+================================ */
+.stat-card {
+    padding: 18px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+}
+
+/* ===============================
+   📜 TABLE (CLEANER)
+================================ */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+}
+
+.table th {
+    background: rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.table tr:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+/* ===============================
+   ⚠️ ALERTS
+================================ */
+.alert {
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+}
+
+/* ===============================
+   🎛️ SLIDER
+================================ */
+input[type="range"] {
+    width: 100%;
+    accent-color: #00ffc3;
+}
+
+/* ===============================
+   ✨ MICRO ANIMATIONS
+================================ */
+.fade-in {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   📱 RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .card {
+        padding: 15px;
+    }
+
+    h3 {
+        font-size: 1.4rem;
+    }
+}
