@@ -109,9 +109,9 @@ http://127.0.0.1:5000
 
 ## Team Members
 
-1. Your Name (Enrollment No.)
-2. Team Member 2
-3. Team Member 3
+1. Devraj Raghuwanshi (SC23CS302012)
+2. Sudhanshu Tawar (SC23CS302034)
+3. Vivek Tanwar (SC23CS302037)
 
 ---
 
@@ -119,27 +119,18 @@ http://127.0.0.1:5000
 
 ### Login Page
 
-(Add Screenshot)
+<img width="770" height="750" alt="image" src="https://github.com/user-attachments/assets/1b529510-2b94-4abb-a413-19792dab2e3e" />
+
 
 ### Dashboard
 
-(Add Screenshot)
+<img width="1689" height="769" alt="image" src="https://github.com/user-attachments/assets/0719c9ce-c903-49b8-af6d-ec06035ac039" />
+
 
 ### Expense History
 
-(Add Screenshot)
+<img width="1685" height="522" alt="image" src="https://github.com/user-attachments/assets/363c097f-6a17-4021-bf5d-a17eb80be7fb" />
 
-### Analysis Page
-
-(Add Screenshot)
-
-### Budget Management
-
-(Add Screenshot)
-
-### Goal Management
-
-(Add Screenshot)
 
 ---
 
